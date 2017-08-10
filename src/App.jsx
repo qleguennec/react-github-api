@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 
-import NavBar from './components/components'
+import NavBar from './components/navbar'
 import MainScreen from './screens/mainScreen'
 
 class App extends React.Component {
@@ -10,7 +10,7 @@ class App extends React.Component {
     return (
       <div className="App">
         <NavBar title="github-test-api" />
-        <MainScreen />
+      <MainScreen frame_type="user_search" />
       </div>
     );
   }
