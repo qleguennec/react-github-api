@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import './navbar.css'
+import './navBar.css'
 
 class NavBar extends React.Component {
   render() {

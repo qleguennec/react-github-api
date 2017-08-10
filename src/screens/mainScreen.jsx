@@ -4,8 +4,12 @@ import PropTypes from 'prop-types'
 import InputBar from '../components/inputBar'
 
 const frame_types = {
-  'user_search': () => {
-    return <InputBar />
+  'user_search': function () {
+    return <InputBar
+      mainScreenCallback={
+          (input) => {return this.setState({inputFromBar: input})}
+      }
+    />
   },
   'none': () => {
     return <div>none</div>
@@ -13,9 +17,26 @@ const frame_types = {
 }
 
 class MainScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      inputFromBar: ""
+    }
+  }
+
+  fetchGithubUsernameInfo () {
+    const usernameInfoOrError =
+      fetch(`https://api.github.com/users/${this.state.inputFromBar}/repos`)
+        .then((response) => response.json());
+    console.log(usernameInfoOrError);
+  }
+
+  componentWillUpdate (nextProps, nextState) {
+    
+  }
+
   render () {
-    const { frame_type } = this.props
-    return frame_types[frame_type]()
+    return (frame_types[this.props.frame_type]).call(this);
   }
 }
 
