@@ -1,5 +1,7 @@
 import React from 'react'
-// import PropTypes from 'prop-types'
+import PropTypes from 'prop-types'
+
+import './inputBar.css'
 
 class InputBar extends React.Component {
   constructor(props) {
@@ -13,18 +15,24 @@ class InputBar extends React.Component {
 
   handleSubmit (ev) {
     ev.preventDefault();
+    this.props.validationFunc(this.input)
+      .then();
     this.props.mainScreenCallback(this.input);
   }
 
   render () {
     return (
-      <form onSubmit={this.handleSubmit.bind(this)}>
-        <label>
-          Enter github username:
-          <input type="text" name="username" onChange={this.handleChange.bind(this)} />
-        </label>
-        <input type="submit" value="go" />
-      </form>
+      <div>
+        <form onSubmit={this.handleSubmit.bind(this)}>
+          <label>
+            Enter github username:
+            <input type="text" name="username" onChange={this.handleChange.bind(this)} />
+          </label>
+          <input type="submit" value="go" />
+        </form>
+      {this.props.msg && (function ({ text, ...rest })
+        {return <div {...rest}>text</div>})(this.props.msg)}
+    </div>
     );
   }
 }
@@ -32,5 +40,7 @@ class InputBar extends React.Component {
 export default InputBar;
 
 InputBar.propTypes = {
-  // mainScreenCallback: PropTypes. ? must be function type
+  mainScreenCallback: PropTypes.func.isRequired,
+  errorFunc: PropTypes.func,
+  validationFunc: PropTypes.func
 }

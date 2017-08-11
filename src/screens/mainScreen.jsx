@@ -7,8 +7,10 @@ const frame_types = {
   'user_search': function () {
     return <InputBar
       mainScreenCallback={
-          (input) => {return this.setState({inputFromBar: input})}
+        (input) => {return this.setState({inputFromBar: input})}
       }
+      {this.additionalFrameArg && this.additionalFrameArg}
+      // msg={{text: "test", className: "errorMsg"}}
     />
   },
   'none': () => {
@@ -21,18 +23,20 @@ class MainScreen extends React.Component {
     super(props);
     this.state = {
       inputFromBar: ""
+      additionalFrameArg: nil
     }
   }
 
   fetchGithubUsernameInfo () {
     const usernameInfoOrError =
       fetch(`https://api.github.com/users/${this.state.inputFromBar}/repos`)
+        .catch(() => this.setState({additionalFrameArg: {text: "username not found", className: "errorMsg"}}))
         .then((response) => response.json());
     console.log(usernameInfoOrError);
   }
 
   componentWillUpdate (nextProps, nextState) {
-    
+
   }
 
   render () {
