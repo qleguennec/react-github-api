@@ -14,8 +14,8 @@ class NavBar extends React.Component {
   }
 }
 
+export default NavBar;
+
 NavBar.propTypes = {
   title: PropTypes.string.isRequired
 }
-
-export default NavBar;

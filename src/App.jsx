@@ -1,8 +1,8 @@
 import React from 'react';
 import './App.css';
 
-import NavBar from './components/navBar'
-import MainScreen from './screens/mainScreen'
+import NavBar from './components/navBar';
+import MainScreen from './screens/mainScreen';
 
 class App extends React.Component {
 

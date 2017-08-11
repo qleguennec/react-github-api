@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import _ from 'lodash'
 
 import './inputBar.css'
 
@@ -9,18 +10,18 @@ class InputBar extends React.Component {
     this.input = "";
   }
 
-  handleChange (ev) {
+  handleChange(ev) {
     this.input = ev.target.value;
   }
 
-  handleSubmit (ev) {
+  handleSubmit(ev) {
     ev.preventDefault();
     this.props.validationFunc(this.input)
-      .then();
-    this.props.mainScreenCallback(this.input);
+      .then(_.partial(this.props.mainScreenCallback))
+      .catch(_.partial(this.props.errorFunc));
   }
 
-  render () {
+  render() {
     return (
       <div>
         <form onSubmit={this.handleSubmit.bind(this)}>
@@ -30,8 +31,6 @@ class InputBar extends React.Component {
           </label>
           <input type="submit" value="go" />
         </form>
-      {this.props.msg && (function ({ text, ...rest })
-        {return <div {...rest}>text</div>})(this.props.msg)}
     </div>
     );
   }
@@ -41,6 +40,6 @@ export default InputBar;
 
 InputBar.propTypes = {
   mainScreenCallback: PropTypes.func.isRequired,
-  errorFunc: PropTypes.func,
-  validationFunc: PropTypes.func
+  errorFunc: PropTypes.func.isRequired,
+  validationFunc: PropTypes.func.isRequired
 }
