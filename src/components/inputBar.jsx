@@ -17,8 +17,8 @@ class InputBar extends React.Component {
   handleSubmit(ev) {
     ev.preventDefault();
     this.props.validationFunc(this.input)
-      .then(_.partial(this.props.mainScreenCallback))
-      .catch(_.partial(this.props.errorFunc));
+        .then(_.partial(this.props.mainScreenCallback, this.props.updateFunc))
+        .catch(_.partial(this.props.errorFunc, this.props.updateFunc));
   }
 
   render() {
@@ -39,6 +39,7 @@ class InputBar extends React.Component {
 export default InputBar;
 
 InputBar.propTypes = {
+  updateFunc: PropTypes.func.isRequired,
   mainScreenCallback: PropTypes.func.isRequired,
   errorFunc: PropTypes.func.isRequired,
   validationFunc: PropTypes.func.isRequired

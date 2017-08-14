@@ -7,18 +7,17 @@ const frame_types = {
   'user_search': function() {
     return (
       <InputBar
-        mainScreenCallback={(input) => {
-            return this.setState({inputFromBar: input})}
+        updateFunc={this.setState.bind(this)}
+        mainScreenCallback={(updater, input) => {
+            updater({inputFromBar: input})}
         }
-        errorFunc={(err) => {
-            return this.setState({errorMsg: "username not found, err: " + err})}
+        errorFunc={(updater, err) => {
+            updater({errorMsg: err})}
         }
-        validationFunc={
-          /* (input) => {
-              return fetch(`https://api.github.com/users/${input}/repos`)
-              .then((resp) => resp.json());
-             } */
-          () => {throw "test";}
+        validationFunc={(input) => {
+            return fetch(`https://api.github.com/users/${input}/repos`)
+              .then((resp) => resp.ok ? resp.json() : Promise.reject("username not found"));
+          }
         }
       />
     )
@@ -38,14 +37,16 @@ class MainScreen extends React.Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
-
+    console.log(nextState);
   }
 
   render() {
     return (
       <div>
-        {frame_types[this.props.frame_type].call(this)}
-        {this.errorMsg}
+        <div>
+          {frame_types[this.props.frame_type].call(this)}
+          {this.state.errorMsg}
+        </div>
       </div>
     );
 
