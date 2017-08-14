@@ -10,7 +10,7 @@ class App extends React.Component {
     return (
       <div className="App">
         <NavBar title="github-test-api" />
-      <MainScreen frame_type="user_search" />
+      <MainScreen />
       </div>
     );
   }

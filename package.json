@@ -5,10 +5,13 @@
   "dependencies": {
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
-    "react-scripts": "0.9.5"
+    "react-redux": "^5.0.6",
+    "react-scripts": "0.9.5",
+    "redux": "^3.7.2"
   },
   "devDependencies": {
-    "prop-types": "^15.5.10"
+    "prop-types": "^15.5.10",
+    "redux-devtools": "^3.4.0"
   },
   "scripts": {
     "start": "react-scripts start",
