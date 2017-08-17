@@ -24,13 +24,11 @@ class List extends React.Component {
         , (acc, [a, b]) => acc + a + "=" + b + "&"
         , request(userInfo) + "?");
 
-    console.log(requestWithAttributes);
     fetch(requestWithAttributes)
       .then(fp.invoke('json'))
       .then((result) => this.setState(
         function (prevState, props) {
           prevState.cache[page] = result;
-          console.log(page);
           return {cache: prevState.cache};
     }));
   }
@@ -59,14 +57,12 @@ class List extends React.Component {
     if (cache.length === 0)
       return false;
 
-    console.log(cache);
-
     return (
       <div>
         <ul>
           {cache[page].map((x) => <li key={x.name}>{x.name}</li>)}
         </ul>
-        <ul className="pagination">
+        <ul className="list">
           <li key="Previous">Previous</li>
           {_.range(1, 1 + userInfo.public_repos / _.get(requestAttributes, 'per_page', 30))
             .map((n) => <li onClick={() => this.setState({page: n})}key={n}>{n}</li>)}

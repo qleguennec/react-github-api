@@ -31,7 +31,7 @@ class InputBar extends React.Component {
           </label>
           <input type="submit" value="go" />
         </form>
-    </div>
+      </div>
     );
   }
 }
