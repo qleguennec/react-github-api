@@ -18,7 +18,9 @@ const frame_types = {
         <List
           userInfo={userInfo}
           request={(user) => "https://api.github.com/users/" + user.login + "/repos"}
-          requestAttributes={{page}}
+          requestAttributes={{}}
+          cacheKey={fp.get('login')}
+          pageCount={fp.get('public_repos')}
         />
       </div>
     )},

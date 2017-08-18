@@ -1,7 +1,6 @@
 import React from 'react'
 
 import InputBar from '../components/inputBar'
-
 import UserScreen from '../screens/userScreen'
 
 class MainScreen extends React.Component {
@@ -14,10 +13,6 @@ class MainScreen extends React.Component {
     }
   }
 
-  /* componentWillUpdate(nextProps, nextState) {
-   *   console.log(nextState);
-   * }
-   */
   render() {
     return (
       <div>
@@ -35,7 +30,7 @@ class MainScreen extends React.Component {
          }}
         />
         {this.state.errorMsg}
-        {this.state.currentUserScreenFrame &&
+        {this.state.inputFromBar &&
           <UserScreen
             currentFrame={this.state.currentUserScreenFrame}
             userInfo={this.state.inputFromBar}
