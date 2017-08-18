@@ -1,8 +1,8 @@
 import React from 'react'
 
-import InputBar from '../components/inputBar'
+import InputBar from '../components/InputBar'
 
-import UserScreen from '../screens/userScreen'
+import GithubUser from '../githubUser/GithubUser'
 
 class MainScreen extends React.Component {
   constructor(props) {
@@ -14,10 +14,6 @@ class MainScreen extends React.Component {
     }
   }
 
-  /* componentWillUpdate(nextProps, nextState) {
-   *   console.log(nextState);
-   * }
-   */
   render() {
     return (
       <div>
@@ -36,7 +32,7 @@ class MainScreen extends React.Component {
         />
         {this.state.errorMsg}
         {this.state.currentUserScreenFrame &&
-          <UserScreen
+          <GithubUser
             currentFrame={this.state.currentUserScreenFrame}
             userInfo={this.state.inputFromBar}
           />}

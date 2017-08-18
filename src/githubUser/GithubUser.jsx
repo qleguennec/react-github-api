@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 import _ from 'lodash'
 import fp from 'lodash/fp'
 
-import List from '../components/list'
+import FetchList from '../components/FetchList'
 
-import './userScreen.css'
+import './GithubUser.css'
 
 const frame_types = {
   'repo_list': function () {
@@ -13,24 +13,15 @@ const frame_types = {
     const { userInfo } = this.props;
 
     return (
-      <div>
-        <h2>Found {userInfo.public_repos} repositories</h2>
-        <List
-          userInfo={userInfo}
-          request={(user) => "https://api.github.com/users/" + user.login + "/repos"}
-          requestAttributes={{page}}
-        />
-      </div>
     )},
 }
 
-class UserScreen extends React.Component {
+class GithubUser extends React.Component {
   constructor(props) {
     super(props);
-    this.userRepoList = undefined;
     this.state = {
-      page: 1,
       currentFrame: this.props.currentFrame
+      userData: undefined;
     };
   }
 
@@ -44,16 +35,24 @@ class UserScreen extends React.Component {
     this.setState({currentFrame: nextProps.currentFrame});
   }
 
+  componentWillMount () {
+    getUserRepoList()
+  }
+
   render () {
+    switch (this.state.currentFrame) {
+      'repo_list':
+        return (<RepoList userData />);
+    }
     return (
       <div>{frame_types[this.state.currentFrame].call(this)}</div>
     );
   }
 }
 
-export default UserScreen;
+export default GithubUser;
 
-UserScreen.propTypes = {
+GithubUser.propTypes = {
   currentFrame: PropTypes.string.isRequired,
   userInfo: PropTypes.object.isRequired
 }

@@ -3,9 +3,7 @@ import PropTypes from 'prop-types'
 import _ from 'lodash'
 import fp from 'lodash/fp'
 
-import '../screens/userScreen.css'
-
-class List extends React.Component {
+class FetchList extends React.Component {
   constructor(props) {
     super(props);
     this.forceRender = true;
@@ -38,7 +36,7 @@ class List extends React.Component {
   }
 
   shouldComponentUpdate (nextProps, nextState) {
-    if (nextState.cache[nextState.page] == undefined) {
+    if (nextState.cache[nextState.page] === undefined) {
       this.fetchRequest(nextState.page);
       this.forceRender = true;
       return (false);
@@ -58,7 +56,7 @@ class List extends React.Component {
       return false;
 
     return (
-      <div>
+      <div ref={e=> this.madiv = e}>
         <ul>
           {cache[page].map((x) => <li key={x.name}>{x.name}</li>)}
         </ul>
@@ -72,9 +70,9 @@ class List extends React.Component {
     )}
 }
 
-export default List;
+export default FetchList;
 
-List.propTypes = {
+FetchList.propTypes = {
   userInfo: PropTypes.object.isRequired,
   request: PropTypes.func.isRequired,
   requestAttributes: PropTypes.object.isRequired

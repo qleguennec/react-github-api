@@ -1,3 +1,0 @@
-const list = (state, action) => {
-
-}

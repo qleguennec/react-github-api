@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
 
-import './inputBar.css'
+import './InputBar.css'
 
 class InputBar extends React.Component {
   constructor(props) {
