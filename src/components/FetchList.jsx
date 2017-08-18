@@ -1,69 +1,59 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import _ from 'lodash'
 import fp from 'lodash/fp'
 
 class FetchList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.forceRender = true;
-    this.cache = {};
-    this.state = {
-      itemList: undefined,
-      page: 0
-    };
-  }
-
-  fetchRequest (page) {
-    const { userInfo, request, requestAttributes } =
-      fp.set('requestAttributes.page', page, this.props);
+  fetchRequest (props, page) {
+    const { userData, request, requestAttributes } =
+      fp.set('requestAttributes.page', page, props);
     const requestWithAttributes =
       _.reduce(
         fp.entries(requestAttributes)
         , (acc, [a, b]) => acc + a + "=" + b + "&"
-        , request(userInfo) + "?");
+        , request(userData) + "?");
+    const per_page = _.get(props.requestAttributes, 'per_page', 30)
 
     fetch(requestWithAttributes)
       .then(fp.invoke('json'))
       .then((function (resp) {
-        _.concat(this.currentUserCache);
-        this.setState({itemList: resp})
+        this.currentUserCache = [...this.currentUserCache, ...resp];
+        this.setState((state) =>
+          ({itemList:
+          this.currentUserCache.slice((page - 1) * per_page
+            , page * per_page)
+            , page}))
       }).bind(this));
   }
 
   changePage (n) {
-    if (n != this.state.page)
-      this.setState({page : n});
+    if (n !== this.state.page)
+      this.fetchRequest(this.props, n);
   }
 
-  componentWillReceiveProps () {
-    this.setState({page: 0});
+  initCache (props) {
+    const key = props.cacheKey(props.userData);
+
+    if (!_.has(props.cache, key))
+      _.set(this.cache, key, []);
+    this.currentUserCache = _.get(this.cache, key);
+    this.fetchRequest(props, 1);
   }
 
-  shouldComponentUpdate (nextProps, nextState) {
-    if (nextState.page == this.state.page)
-      return (true);
-    if (!this.currentUserCache[
-        (nextState.page - 1)
-          * _.get(this.props.requestAttributes, 'per_page', 30)])
-      this.fetchRequest(nextState.page);
-    return (false);
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.userData.login !== this.props.userData.login)
+      this.initCache(nextProps);
+  }
+
+  componentWillMount () {
+    this.initCache(this.props);
   }
 
   render () {
-    if (this.state.page === 0) {
-      const key = this.props.cacheKey(this.props.userInfo);
-
-      if (!_.has(this.props.cache, key))
-        _.set(this.cache, key, []);
-      this.currentUserCache = _.get(this.cache, key);
-      this.setState({page: 1});
-      return (false);
-    }
     const { itemList } = this.state;
-    const { pageCount, userInfo, requestAttributes } = this.props;
-    const n_pages = pageCount(userInfo) / _.get(requestAttributes, 'per_page', 30);
-    console.log("render");
+    const { pageCount, userData, requestAttributes } = this.props;
+    const n_pages = pageCount(userData) / _.get(requestAttributes, 'per_page', 30);
 
     return (
       <div ref={e=> this.madiv = e}>
@@ -81,12 +71,15 @@ class FetchList extends React.Component {
   }
 }
 
-export default FetchList;
+const mapState = (state) => ({userData: state.user.userCache[state.users.currentUser]});
+const mapDispatch = (dispatch) => ;
 
 FetchList.propTypes = {
-  userInfo: PropTypes.object.isRequired,
+  userData: PropTypes.object,
   request: PropTypes.func.isRequired,
   requestAttributes: PropTypes.object.isRequired,
   cacheKey: PropTypes.func.isRequired,
   pageCount: PropTypes.func.isRequired
 }
+
+export default connect(mapState, mapDispatch)(FetchList);
