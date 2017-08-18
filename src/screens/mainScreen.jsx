@@ -31,8 +31,8 @@ class MainScreen extends React.Component {
          }}
         />
         {this.state.errorMsg}
-        {this.state.currentUserScreenFrame &&
-          <GithubUser
+        {this.state.inputFromBar &&
+          <UserScreen
             currentFrame={this.state.currentUserScreenFrame}
             userInfo={this.state.inputFromBar}
           />}
