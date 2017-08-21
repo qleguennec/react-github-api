@@ -1,19 +1,14 @@
-
-import React from 'react';
-import PropTypes from 'prop-types';
-import fp from 'lodash/fp';
+import React from "react";
+import PropTypes from "prop-types";
 
 class RepoList extends React.Component {
-
-  render () {
+  render() {
+    return <h2>{this.props.user.login}</h2>;
   }
 }
 
 RepoList.propTypes = {
-
+  user: PropTypes.object.isRequired
 };
 
-const mapState = (state) =>
-      ({});
-
-export default connect(mapState)(RepoList);
+export default RepoList;

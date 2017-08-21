@@ -1,11 +1,10 @@
-import React from 'react'
+import React from "react";
 
-import InputBar from '../components/InputBar'
+import InputBar from "../components/InputBar";
 
-import GithubUser from '../githubUser/GithubUser'
+import GithubUser from "../githubUser/GithubUser";
 
 class MainScreen extends React.Component {
-
   render() {
     return (
       <div>

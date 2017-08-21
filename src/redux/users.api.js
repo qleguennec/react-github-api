@@ -1,38 +1,43 @@
 import fp from "lodash/fp";
+import _ from "lodash";
 
-const fetchUserApi = (args) => (dispatch, getState) => {
-  return (getState().users[args.cacheKey])
-    ? dispatch({type: 'USER_DATA_ALREADY_THERE'})
-    : fetch(args.buildRequest)
-    .then(fp.invoke('json'))
-    .catch((err) =>
-           dispatch({type: 'ADD_ERROR', payload: {error: err}}))
-    .then((result) =>
-          dispatch({type: args.action, payload: args.buildPayload(result)}));
-};
+const fetchUserApi = args => dispatch =>
+  args.checkout()
+    ? args.checkoutDispatch()
+    : fetch(args.request)
+        .then(fp.invoke("json"))
+        .then(
+          result =>
+            result.message && result.message === "Not Found"
+              ? Promise.reject("user not found")
+              : Promise.resolve(result)
+        )
+        .catch(err => {
+          dispatch({ type: "ERROR_ADD", payload: err });
+        })
+        .then(args.okDispatch);
 
-const fetchUser = (input) => fetchUserApi({
-  cacheKey: input,
-  buildRequest: "https://api.github.com/users/" + input,
-  action: 'USER_ADD',
-  buildPayload: (result) => ({login: result.login
-                             , data: {[result.login]: result}})
-});
+const fetchUser = input => (dispatch, getState) =>
+  dispatch(
+    fetchUserApi({
+      checkout: () => _.get(getState().users.userData, input) !== undefined,
+      checkoutDispatch: () =>
+        dispatch({
+          type: "USER_SET_CURRENT",
+          payload: input
+        }),
+      request: "http://api.github.com/users/" + input,
+      okDispatch: result =>
+        dispatch({
+          type: "USER_ADD",
+          payload: { login: result.login, data: result }
+        })
+    })
+  );
 
-
-// const fetchUser = (input) => async (dispatch, getState) => {
-//   if (getState().users[input])
-//     return dispatch({type: 'none'});
-//   try {
-//     const resp = await fetch(`https://api.github.com/users/${input}`);
-//     const result = await resp.json();
-//     dispatch({type: 'USER_ADD', payload: {login: result.login, data: {[result.login]: result}}});
-//   }
-//   catch (exp) {
-//     dispatch({type: 'ERROR_ADD', payload: {error: exp}});
-//   }
-// };
-
+// const fetchRepo = (user, page) => fetchUserApi({
+//   cacheKey:
+// });
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // const fetchUserRepo = (user, page) => async (dispatch, getstate) = {                     //

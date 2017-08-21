@@ -1,10 +1,10 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import React from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
 
-import fetchUser from '../redux/users.api';
+import fetchUser from "../redux/users.api";
 
-import './InputBar.css';
+import "./inputBar.css";
 
 class InputBar extends React.Component {
   render() {
@@ -12,20 +12,29 @@ class InputBar extends React.Component {
       <div>
         <label>
           Enter github username:
-          <input ref={(e) => this.input = e} type="text" name="username" />
+          <input
+            type="submit"
+            ref={e => (this.input = e)}
+            type="text"
+            name="username"
+          />
         </label>
-        <input type="submit" value="go" onClick={() => this.props.onClick(this.input.value)} />
+        <input
+          type="submit"
+          value="go"
+          onClick={() => this.props.onClick(this.input.value)}
+        />
       </div>
     );
   }
 }
 
-const mapDispatch = (dispatch) => (
-  {onClick:
-   (input) => {
-     dispatch(fetchUser(input));
-     dispatch({type: 'CHANGE_ROUTE', payload: 'repo_list'});}
-  });
+const mapDispatch = dispatch => ({
+  onClick: input => {
+    dispatch(fetchUser(input));
+    dispatch({ type: "CHANGE_ROUTE", payload: "repo_list" });
+  }
+});
 
 InputBar.propTypes = {
   onClick: PropTypes.func.isRequired

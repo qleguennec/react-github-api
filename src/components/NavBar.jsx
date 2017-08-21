@@ -1,11 +1,11 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React from "react";
+import PropTypes from "prop-types";
 
-import './NavBar.css'
+import "./navBar.css";
 
 class NavBar extends React.Component {
   render() {
-    const { title } = this.props
+    const { title } = this.props;
     return (
       <div className="navBar">
         <span className="title">{title}</span>
@@ -16,6 +16,6 @@ class NavBar extends React.Component {
 
 NavBar.propTypes = {
   title: PropTypes.string.isRequired
-}
+};
 
 export default NavBar;
