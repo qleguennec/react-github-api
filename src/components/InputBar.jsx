@@ -1,14 +1,12 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import _ from 'lodash'
-import { connect } from 'react-redux'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
-import fetchUser from '../redux/users.api'
+import fetchUser from '../redux/users.api';
 
-import './InputBar.css'
+import './InputBar.css';
 
 class InputBar extends React.Component {
-
   render() {
     return (
       <div>
@@ -22,11 +20,15 @@ class InputBar extends React.Component {
   }
 }
 
-const mapDispatch = (dispatch) =>
-  ({onClick: (input) => dispatch(fetchUser(input))})
-
-export default connect(undefined, mapDispatch)(InputBar);
+const mapDispatch = (dispatch) => (
+  {onClick:
+   (input) => {
+     dispatch(fetchUser(input));
+     dispatch({type: 'CHANGE_ROUTE', payload: 'repo_list'});}
+  });
 
 InputBar.propTypes = {
   onClick: PropTypes.func.isRequired
-}
+};
+
+export default connect(undefined, mapDispatch)(InputBar);

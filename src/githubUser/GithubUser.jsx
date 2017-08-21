@@ -1,30 +1,42 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import _ from 'lodash'
-import fp from 'lodash/fp'
-import { connect } from 'react-redux'
-import FetchList from '../components/FetchList'
-import RepoList from './RepoList'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import RepoList from './RepoList';
+import _ from "lodash";
+import fp from "lodash/fp";
 
-import './GithubUser.css'
+import './GithubUser.css';
 
 class GithubUser extends React.Component {
+  frameToDisplay () {
+    switch (this.props.frame) {
+    case 'repo_list':
+      return (<RepoList user={this.props.user}/>);
+    default:
+      return (<div></div>);
+    }
+  }
 
   render () {
-    switch (this.props.currentFrame) {
-      case 'repo_list':
-        return (<RepoList />);
-      default:
-        return (false);
-    }
+    console.log(this.props.user);
+    return (
+      <div>
+        <div>
+          {this.frameToDisplay()}
+        </div>
+      </div>
+    );
   }
 }
 
-const mapState = (state) =>
-  ({currentFrame: state.ui.currentFrame})
+const mapState = (state) => ({
+  frame: state.ui.frame,
+  user: _.get(state.users.userCache, state.users.currentUser)
+});
 
 GithubUser.propTypes = {
-  currentFrame: PropTypes.string.isRequired,
-}
+  frame: PropTypes.string,
+  user: PropTypes.string
+};
 
 export default connect(mapState)(GithubUser);

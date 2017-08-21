@@ -1,16 +1,17 @@
 const initialState = {
-  currentFrame: 'repo_list'
-}
+  frame: 'none',
+  page: 0
+};
 
 const ui = (state = initialState, action = {}) => {
-  const { name, userData } = action.payload || {};
-
   switch (action.type) {
     case 'CHANGE_ROUTE':
-      return {...state, currentFrame: action.payload.route};
+        return {...state, frame: action.payload};
+    case 'CHANGE_LIST_PAGE':
+        return {...state, page: action.payload};
     default:
-      return state;
+        return state;
   }
-}
+};
 
 export default ui;
