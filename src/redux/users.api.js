@@ -1,10 +1,12 @@
 import fp from "lodash/fp";
 import _ from "lodash";
+import { getCurrentUser } from "../redux/users.js";
+import { n_repos_per_page, repoListState } from "../util/repos.js";
 
 const fetchUserApi = args => dispatch =>
   args.checkout()
     ? args.checkoutDispatch()
-    : fetch(args.request)
+    : fetch(args.request())
         .then(fp.invoke("json"))
         .then(
           result =>
@@ -26,7 +28,7 @@ const fetchUser = input => (dispatch, getState) =>
           type: "USER_SET_CURRENT",
           payload: input
         }),
-      request: "http://api.github.com/users/" + input,
+      request: () => "http://api.github.com/users/" + input,
       okDispatch: result =>
         dispatch({
           type: "USER_ADD",
@@ -35,23 +37,17 @@ const fetchUser = input => (dispatch, getState) =>
     })
   );
 
-// const fetchRepo = (user, page) => fetchUserApi({
-//   cacheKey:
-// });
+const fetchRepo = page => (dispatch, getState) => {
+  const user = getCurrentUser(getState().users);
+  return dispatch(
+    fetchUserApi({
+      checkout: () =>
+        !user || repoListState(getState()).length !== n_repos_per_page,
+      checkoutDispatch: () => {},
+      request: () => user.repos_url + "?page=" + page,
+      okDispatch: result => dispatch({ type: "USER_REPO_ADD", payload: result })
+    })
+  );
+};
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-// const fetchUserRepo = (user, page) => async (dispatch, getstate) = {                     //
-//   if (getState().users[page])                                                            //
-//     return (dispatch({type: 'none'}));                                                   //
-//   try {                                                                                  //
-//     const resp = await fetch(`https://api.github.com/users/${user}/repos?page=${page}`); //
-//     const result = await repo.json();                                                    //
-//     dispatch({type: 'ADD_USER_REPO'});                                                   //
-//   }                                                                                      //
-//   catch (exp) {                                                                          //
-//     dispatch({type: 'ADD_ERROR', payload: {error: exp}});                                //
-//   }                                                                                      //
-// };                                                                                       //
-//////////////////////////////////////////////////////////////////////////////////////////////
-
-export default fetchUser;
+export { fetchRepo, fetchUser };

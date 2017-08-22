@@ -1,8 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-
-import fetchUser from "../redux/users.api";
+import { fetchUser } from "../redux/users.api";
 
 import "./inputBar.css";
 
@@ -12,12 +11,7 @@ class InputBar extends React.Component {
       <div>
         <label>
           Enter github username:
-          <input
-            type="submit"
-            ref={e => (this.input = e)}
-            type="text"
-            name="username"
-          />
+          <input ref={e => (this.input = e)} type="text" name="username" />
         </label>
         <input
           type="submit"
@@ -30,10 +24,7 @@ class InputBar extends React.Component {
 }
 
 const mapDispatch = dispatch => ({
-  onClick: input => {
-    dispatch(fetchUser(input));
-    dispatch({ type: "CHANGE_ROUTE", payload: "repo_list" });
-  }
+  onClick: input => dispatch(fetchUser(input))
 });
 
 InputBar.propTypes = {

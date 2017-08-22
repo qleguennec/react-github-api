@@ -1,16 +1,18 @@
+import fp from "lodash/fp";
+
 const initialState = {
-  frame: 'none',
+  frame: "repo_list",
   page: 0
 };
 
 const ui = (state = initialState, action = {}) => {
   switch (action.type) {
-    case 'CHANGE_ROUTE':
-        return {...state, frame: action.payload};
-    case 'CHANGE_LIST_PAGE':
-        return {...state, page: action.payload};
+    case "UI_CHANGE_ROUTE":
+      return fp.assign({ frame: action.payload }, state);
+    case "UI_CHANGE_PAGE":
+      return fp.assign({ page: action.payload }, state);
     default:
-        return state;
+      return state;
   }
 };
 

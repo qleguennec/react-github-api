@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import RepoList from "./RepoList";
-import { getCurrentUser } from "../redux/users.js";
 
 import "./GithubUser.css";
 
@@ -10,9 +9,7 @@ class GithubUser extends React.Component {
   frameToDisplay() {
     switch (this.props.frame) {
       case "repo_list": {
-        if (this.props.user) {
-          return <RepoList user={this.props.user} />;
-        }
+        return <RepoList />;
       }
       default:
         return <div />;
@@ -22,16 +19,13 @@ class GithubUser extends React.Component {
   render() {
     return (
       <div>
-        <div>
-          {this.frameToDisplay()}
-        </div>
+        {this.frameToDisplay()}
       </div>
     );
   }
 }
 
 const mapState = state => ({
-  user: getCurrentUser(state.users),
   frame: state.ui.frame
 });
 

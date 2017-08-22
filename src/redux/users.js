@@ -1,6 +1,7 @@
 import _ from "lodash";
+import fp from "lodash/fp";
 
-const getCurrentUser = users => _.get(users.userData, users.currentUser);
+import getCurrentUser from "../util/users";
 
 const initialState = {
   currentUser: undefined,
@@ -8,6 +9,8 @@ const initialState = {
 };
 
 const users = (state = initialState, action = {}) => {
+  const user = getCurrentUser(state);
+
   switch (action.type) {
     case "USER_ADD":
       return {
@@ -17,8 +20,18 @@ const users = (state = initialState, action = {}) => {
           ...{ [action.payload.login]: action.payload.data }
         }
       };
+    case "USER_REPO_ADD":
+      return {
+        ...state,
+        ...{
+          [user.login]: {
+            ...user,
+            repos: [...user.repos, action.payload.result]
+          }
+        }
+      };
     case "USER_SET_CURRENT":
-      return { currentUser: action.payload };
+      return fp.assign({ currentUser: action.payload }, state);
     default:
       return state;
   }
