@@ -8,9 +8,9 @@ const initialState = {
 const ui = (state = initialState, action = {}) => {
   switch (action.type) {
     case "UI_CHANGE_ROUTE":
-      return fp.assign({ frame: action.payload }, state);
+      return fp.extend(state, { frame: action.payload });
     case "UI_CHANGE_PAGE":
-      return fp.assign({ page: action.payload }, state);
+      return fp.extend(state, { page: action.payload });
     default:
       return state;
   }

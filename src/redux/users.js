@@ -1,4 +1,3 @@
-import _ from "lodash";
 import fp from "lodash/fp";
 
 import getCurrentUser from "../util/users";
@@ -10,7 +9,7 @@ const initialState = {
 
 const users = (state = initialState, action = {}) => {
   const user = getCurrentUser(state);
-
+  console.log(action);
   switch (action.type) {
     case "USER_ADD":
       return {
@@ -21,17 +20,12 @@ const users = (state = initialState, action = {}) => {
         }
       };
     case "USER_REPO_ADD":
-      return {
-        ...state,
-        ...{
-          [user.login]: {
-            ...user,
-            repos: [...user.repos, action.payload.result]
-          }
-        }
-      };
+      return fp.extend(
+        { repos: [...user.repos, ...action.payload] },
+        user.repos
+      );
     case "USER_SET_CURRENT":
-      return fp.assign({ currentUser: action.payload }, state);
+      return fp.extend({ currentUser: action.payload }, state);
     default:
       return state;
   }

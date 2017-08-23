@@ -8,8 +8,10 @@ import _ from "lodash";
 
 class RepoList extends React.Component {
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps);
-    if (!nextProps.page) this.props.changePage(1);
+    if (this.props.page == nextProps.page) {
+      nextProps.getRepoList(nextProps.page);
+      nextProps.changePage(1);
+    }
   }
 
   render() {
@@ -33,16 +35,17 @@ const mapState = state => ({
 
 const mapDispatch = dispatch => ({
   changePage: page => {
-    dispatch(fetchRepo(page));
     dispatch({ type: "UI_CHANGE_PAGE", payload: page });
-  }
+  },
+  getRepoList: page => dispatch(fetchRepo(page))
 });
 
 RepoList.propTypes = {
   user: PropTypes.object,
   repo: PropTypes.array,
   page: PropTypes.number,
-  changePage: PropTypes.func.isRequired
+  changePage: PropTypes.func.isRequired,
+  getRepoList: PropTypes.func.isRequired
 };
 
 export default connect(mapState, mapDispatch)(RepoList);
