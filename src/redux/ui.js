@@ -2,7 +2,7 @@ import fp from "lodash/fp";
 
 const initialState = {
   frame: "repo_list",
-  page: 0
+  page: 1
 };
 
 const ui = (state = initialState, action = {}) => {

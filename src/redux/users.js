@@ -1,34 +1,37 @@
-import fp from "lodash/fp";
-
+import extend from "lodash/fp";
+import _ from "lodash";
 import getCurrentUser from "../util/users";
+import { bindReducer } from "../util/util";
 
 const initialState = {
   currentUser: undefined,
   userData: {}
 };
 
-const users = (state = initialState, action = {}) => {
-  const user = getCurrentUser(state);
-  console.log(action);
-  switch (action.type) {
-    case "USER_ADD":
-      return {
-        currentUser: action.payload.login,
-        userData: {
-          ...state.userData,
-          ...{ [action.payload.login]: action.payload.data }
-        }
-      };
-    case "USER_REPO_ADD":
-      return fp.extend(
-        { repos: [...user.repos, ...action.payload] },
-        user.repos
-      );
-    case "USER_SET_CURRENT":
-      return fp.extend({ currentUser: action.payload }, state);
-    default:
-      return state;
-  }
+const initUser = {
+  repos: []
 };
 
-export { users, getCurrentUser };
+const users = (state = initialState, action) =>
+  bindReducer(
+    action,
+    { user: getCurrentUser, logState: console.log },
+    {
+      USER_ADD: payload => state => ({
+        currentUser: payload.login,
+        userData: {
+          ...state.userData,
+          ...{ [payload.login]: extend(payload.data, initUser) }
+        }
+      }),
+
+      USER_REPO_ADD: payload =>
+        extend(
+          extend({ repos: [...this.user.repos, ...payload] }, this.user.repos)
+        ),
+
+      USER_SET_CURRENT: payload => extend({ currentUser: payload })
+    }
+  );
+
+export default users;

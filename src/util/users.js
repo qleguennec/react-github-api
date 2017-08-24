@@ -1,5 +1,6 @@
 import _ from "lodash";
 
-const getCurrentUser = users => _.get(users.userData, users.currentUser);
+const getCurrentUser = state =>
+  _.get(state.users.userData, state.users.currentUser);
 
 export default getCurrentUser;

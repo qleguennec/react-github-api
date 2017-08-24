@@ -1,8 +1,24 @@
-const bindDispatch = (dispatch, type) => x => dispatch({ type, payload: x });
+import _ from "lodash";
+import fp from "lodash/fp";
+
+const bindDispatch = (type, dispatch) => x => dispatch({ type, payload: x });
 
 const logExec = (f, x) => {
-  console.log(x);
-  return f(x);
+  const res = f(x);
+  console.log(f, x, res);
+  return res;
 };
 
-export { bindDispatch, logExec };
+const bindReducer = (action, bindings, reducer) => state => {
+  console.log("bindReducer");
+  console.log(action && _.has(reducer, action.type));
+  console.log(fp.merge(fp.mapValues(state, bindings), reducer));
+  return (!(action && _.has(reducer, action.type))
+    ? _.identity
+    : state =>
+        fp
+          .merge(fp.mapValues(state, bindings), reducer)
+          [action.type](action.payload)(state))(state);
+};
+
+export { bindDispatch, logExec, bindReducer };

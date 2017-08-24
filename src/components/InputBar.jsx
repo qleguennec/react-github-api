@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { fetchUser } from "../redux/users.api";
+import _ from "lodash";
 
 import "./inputBar.css";
 
@@ -23,8 +24,8 @@ class InputBar extends React.Component {
   }
 }
 
-const mapDispatch = dispatch => ({
-  onClick: input => dispatch(fetchUser(input))
+const mapDispatch = _.mapValues({
+  onClick: _.flow(fetchUser)
 });
 
 InputBar.propTypes = {
