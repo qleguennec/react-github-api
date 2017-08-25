@@ -1,7 +1,11 @@
 import _ from "lodash";
 import fp from "lodash/fp";
 
-const bindDispatch = (type, dispatch) => x => dispatch({ type, payload: x });
+const bindProps = props => x => fp.mapValues(f => f(x), props);
+
+const bindDispatch = type => dispatch => x => dispatch({ type, payload: x });
+
+const withDispatch = f => dispatch => _.flow(f, dispatch);
 
 const logExec = (f, x) => {
   const res = f(x);
@@ -9,16 +13,11 @@ const logExec = (f, x) => {
   return res;
 };
 
-const bindReducer = (action, bindings, reducer) => state => {
-  console.log("bindReducer");
-  console.log(action && _.has(reducer, action.type));
-  console.log(fp.merge(fp.mapValues(state, bindings), reducer));
-  return (!(action && _.has(reducer, action.type))
+const bindReducer = (action, bindings, reducer) =>
+  !action || !_.has(reducer, action.type)
     ? _.identity
-    : state =>
-        fp
-          .merge(fp.mapValues(state, bindings), reducer)
-          [action.type](action.payload)(state))(state);
-};
+    : _.flow(bindProps(bindings), fp.merge(reducer), props =>
+        props[action.type].call(props, action.payload)
+      );
 
-export { bindDispatch, logExec, bindReducer };
+export { bindDispatch, logExec, bindReducer, bindProps, withDispatch };

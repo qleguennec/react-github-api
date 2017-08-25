@@ -32,7 +32,6 @@ const mapState = state => ({
 });
 
 GithubUser.propTypes = {
-  user: PropTypes.object,
   frame: PropTypes.string
 };
 

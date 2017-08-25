@@ -2,17 +2,15 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { fetchRepo } from "../redux/users.api";
-import getCurrentUser from "../util/users";
+import { getCurrentUser, getCurrentUserState } from "../util/users";
 import { repoListState } from "../util/repos";
-import { bindDispatch } from "../util/util.js";
+import { withDispatch, bindDispatch, bindProps } from "../util/util.js";
 import _ from "lodash";
 import fp from "lodash/fp";
 
 class RepoList extends React.Component {
   componentWillReceiveProps(nextProps) {
-    if (!nextProps.repo.length) {
-      nextProps.getRepoList(nextProps.page);
-    }
+    if (nextProps.user != this.props.user) nextProps.getRepoList(1);
   }
 
   render() {
@@ -28,15 +26,15 @@ class RepoList extends React.Component {
   }
 }
 
-const mapState = state => ({
-  user: getCurrentUser(state),
-  repo: repoListState(state),
-  page: state.ui.page
+const mapState = bindProps({
+  user: _.flow(fp.get("users"), getCurrentUser),
+  repo: repoListState,
+  page: fp.get("ui.page")
 });
 
-const mapDispatch = _.mapValues({
+const mapDispatch = bindProps({
   changePage: bindDispatch("UI_CHANGE_PAGE"),
-  getRepoList: _.flow(fetchRepo)
+  getRepoList: withDispatch(fetchRepo)
 });
 
 RepoList.propTypes = {

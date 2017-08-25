@@ -1,6 +1,10 @@
 import _ from "lodash";
 
-const getCurrentUser = state =>
-  _.get(state.users.userData, state.users.currentUser);
+const getCurrentUser = users => {
+  console.log(users);
+  return users.currentUser ? users.userData[users.currentUser] : undefined;
+};
 
-export default getCurrentUser;
+const getCurrentUserState = state => getCurrentUser(state.users);
+
+export { getCurrentUser, getCurrentUserState };
