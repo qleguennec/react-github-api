@@ -1,7 +1,8 @@
 import fp from "lodash/fp";
 import _ from "lodash";
-import getCurrentUser from "../redux/users.js";
+import { getCurrentUserState } from "../util/users.js";
 import { repoListState } from "../util/repos.js";
+import { getRepoPage } from "../util/repos";
 import { bindDispatch } from "../util/util.js";
 
 const fetchApi = args => dispatch => {
@@ -12,7 +13,7 @@ const fetchApi = args => dispatch => {
   };
 
   return args.cached()
-    ? bindDispatch("CACHED")(dispatch)(args.input)
+    ? bindDispatch(args.cached_type)(dispatch)(args.input)
     : fetch(args.request())
         .then(fp.invoke("json"))
         .then(
@@ -21,14 +22,15 @@ const fetchApi = args => dispatch => {
               ? Promise.reject({ type: "ERROR_FETCH_NOT_FOUND", error: result })
               : Promise.resolve(result)
         )
-        .catch(bindDispatch("ERROR_ADD")(dispatch))
         .then(log("okDispatch called", args.dispatch));
+  //        .catch(bindDispatch("ERROR_ADD")(dispatch));
 };
 
 const fetchUser = input => (dispatch, getState) =>
   dispatch(
     fetchApi({
       input,
+      cached_type: "USER_CACHED",
       cached: () => _.get(getState().users.userData, input),
       request: () => "http://api.github.com/users/" + input,
       dispatch: bindDispatch("USER_ADD")(dispatch)
@@ -36,14 +38,18 @@ const fetchUser = input => (dispatch, getState) =>
   );
 
 const fetchRepo = page => (dispatch, getState) => {
-  const user = getCurrentUser(getState().users);
-  const repoList = repoListState(getState());
+  const user = getCurrentUserState(getState());
+  const repoList = getRepoPage(page, user);
   return dispatch(
     fetchApi({
       input: page,
-      cached: () => !user || repoList.length,
+      cached_type: "REPO_CACHED",
+      cached: () => repoList !== undefined,
       request: () => user.repos_url + "?page=" + page,
-      dispatch: bindDispatch("USER_REPO_ADD")(dispatch)
+      dispatch: _.flow(
+        x => ({ [page]: x }),
+        bindDispatch("USER_REPO_ADD")(dispatch)
+      )
     })
   );
 };

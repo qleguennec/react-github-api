@@ -1,38 +1,43 @@
-import { merge, assign } from "lodash/fp";
+import { merge, assign, get } from "lodash/fp";
 import _ from "lodash";
-import getCurrentUser from "../util/users";
-import { bindReducer } from "../util/util";
+import { getCurrentUser } from "../util/users";
+import { logExec } from "../util/util";
 
 const initialState = {
   currentUser: undefined,
   userData: {}
 };
-const initUser = {
-  repos: []
-};
-
-const users = (state = initialState, action) =>
-  bindReducer(
-    action,
-    { user: getCurrentUser },
-    {
-      USER_ADD: payload => state => ({
-        currentUser: payload.login,
+const users = (state = initialState, action) => {
+  if (!action) return state;
+  const arg = action.payload;
+  const user = getCurrentUser(state);
+  switch (action.type) {
+    case "USER_ADD":
+      return {
+        currentUser: arg.login,
         userData: {
           ...state.userData,
-          ...{ [payload.login]: merge(payload, initUser) }
+          ...{
+            [arg.login]: { ...arg, repos: {} }
+          }
         }
-      }),
-
-      USER_REPO_ADD: function(payload) {
-        console.log(this);
-        return assign(
-          assign({ repos: [...this.user.repos, ...payload] }, this.user.repos)
-        );
-      },
-
-      USER_SET_CURRENT: payload => assign({ currentUser: payload })
-    }
-  )(state);
+      };
+    case "USER_REPO_ADD":
+      return {
+        ...state,
+        userData: {
+          ...state.userData,
+          [user.login]: { ...user, repos: merge(user.repos, arg) }
+        }
+      };
+    case "USER_CACHED":
+      return {
+        ...state,
+        currentUser: arg
+      };
+    default:
+      return state;
+  }
+};
 
 export default users;

@@ -1,10 +1,10 @@
 import fp from "lodash/fp";
 
-const n_repos_per_page = 30;
+const repos_per_page = 30;
 
-const repoListPage = page =>
-  fp.slice((page - 1) * n_repos_per_page, page * n_repos_per_page);
+const getRepoPage = (page, user) => {
+  if (!user) return undefined;
+  return user.repos[page.toString()];
+};
 
-const repoListState = state => repoListPage(state.ui.page)(state.users.repos);
-
-export { n_repos_per_page, repoListPage, repoListState };
+export { repos_per_page, getRepoPage };

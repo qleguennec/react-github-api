@@ -8,20 +8,10 @@ import fp from "lodash/fp";
 import "./GithubUser.css";
 
 class GithubUser extends React.Component {
-  frameToDisplay() {
-    switch (this.props.frame) {
-      case "repo_list": {
-        return <RepoList />;
-      }
-      default:
-        return <div />;
-    }
-  }
-
   render() {
     return (
       <div>
-        {this.frameToDisplay()}
+        {this.props.frame}
       </div>
     );
   }
@@ -32,7 +22,7 @@ const mapState = state => ({
 });
 
 GithubUser.propTypes = {
-  frame: PropTypes.string
+  frame: PropTypes.object.isRequired
 };
 
 export default connect(mapState)(GithubUser);

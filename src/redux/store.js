@@ -4,10 +4,11 @@ import { composeWithDevTools } from "redux-devtools-extension";
 
 import users from "./users";
 import errors from "./errors";
-import ui from "./ui";
+import repo from "./repo";
+import ui from "./ui.jsx";
 
 const store = createStore(
-  combineReducers({ users, errors, ui }),
+  combineReducers({ repo, users, errors, ui }),
   composeWithDevTools(applyMiddleware(thunk))
 );
 

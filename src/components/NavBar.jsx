@@ -1,21 +1,34 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { getCurrentUserState } from "../util/users";
+import { connect } from "react-redux";
 
-import "./navBar.css";
+import "./NavBar.css";
 
 class NavBar extends React.Component {
   render() {
-    const { title } = this.props;
+    const { user, title } = this.props;
     return (
       <div className="navBar">
-        <span className="title">{title}</span>
+        <div className="title">
+          {title}
+        </div>
+        {user &&
+          <div className="title">
+            {user.login}
+          </div>}
       </div>
     );
   }
 }
 
+const mapState = state => ({
+  user: getCurrentUserState(state)
+});
+
 NavBar.propTypes = {
-  title: PropTypes.string.isRequired
+  title: PropTypes.string.isRequired,
+  user: PropTypes.object
 };
 
-export default NavBar;
+export default connect(mapState)(NavBar);
