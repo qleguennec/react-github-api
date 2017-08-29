@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { getCurrentUserState } from "../util/users";
+import { getSelected, bindProps } from "../util/util";
 import { connect } from "react-redux";
 
 import "./NavBar.css";
@@ -22,8 +22,8 @@ class NavBar extends React.Component {
   }
 }
 
-const mapState = state => ({
-  user: getCurrentUserState(state)
+const mapState = bindProps({
+  user: getSelected("user")
 });
 
 NavBar.propTypes = {

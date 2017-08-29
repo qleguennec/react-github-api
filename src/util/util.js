@@ -13,15 +13,22 @@ const logExec = f => x => {
   return res;
 };
 
-// const bindReducer = (action, bindings, reducer) =>
-//   !action || !_.has(reducer, action.type)
-//     ? _.identity
-//     : st =>
-//         _.flow(
-//           bindProps(bindings),
-//           fp.merge(reducer),
-//           fp.merge(action.payload),
-//           payload => payload[action.type](payload)(st)
-//         )(st);
+const getSelected = prop => state =>
+  state.ui.selected[prop]
+    ? _.find(state[prop], x => x.id == state.ui.selected[prop])
+    : undefined;
 
-export { bindDispatch, logExec, bindProps, withDispatch };
+const currentState = state => state.data[state.current];
+
+const getCurrent = prop => state =>
+  state[prop] ? currentState(state[prop]) : undefined;
+
+export {
+  getCurrent,
+  getSelected,
+  bindDispatch,
+  logExec,
+  bindProps,
+  withDispatch,
+  currentState
+};

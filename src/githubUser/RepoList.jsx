@@ -3,14 +3,13 @@ import PropTypes from "prop-types";
 import Repo from "./Repo.jsx";
 import { connect } from "react-redux";
 import { fetchRepo } from "../redux/users.api";
-import { getCurrentUserState } from "../util/users";
-import { getRepoPage, repos_per_page } from "../util/repos";
 import {
-  withDispatch,
-  bindDispatch,
+  withDispatch as withD,
+  bindDispatch as bindD,
   bindProps,
-  logExec
+  getSelected
 } from "../util/util.js";
+import { dataPerPage } from "../util/config";
 import List from "../components/List.jsx";
 import _ from "lodash";
 import fp from "lodash/fp";
@@ -21,12 +20,12 @@ class RepoList extends React.Component {
       this.props.page !== nextProps.page ||
       !(this.props.user && nextProps.user.login === this.props.user.login)
     )
-      nextProps.getRepoList(nextProps.page);
+      nextProps.fetchPage(nextProps.page);
   }
 
   onRepoClick(key) {
     const { user, page, changeFrame, changeRepo } = this.props;
-    const repoClicked = getRepoPage(page, user)[key];
+    const repoClicked = user.repos[page][key];
 
     changeRepo(repoClicked);
     changeFrame(<Repo />);
@@ -34,7 +33,7 @@ class RepoList extends React.Component {
 
   render() {
     const { changePage, user, page } = this.props;
-    const repo = getRepoPage(page, user);
+    const repo = _.get(user, "repos." + page);
     return (
       <div>
         {repo &&
@@ -42,7 +41,7 @@ class RepoList extends React.Component {
             changePage={changePage}
             onItemClick={this.onRepoClick.bind(this)}
             data={repo}
-            n_pages={user.public_repos / repos_per_page}
+            n_pages={user.public_repos / dataPerPage}
           />}
       </div>
     );
@@ -50,15 +49,15 @@ class RepoList extends React.Component {
 }
 
 const mapState = bindProps({
-  user: getCurrentUserState,
+  user: getSelected("users"),
   page: fp.get("ui.page")
 });
 
 const mapDispatch = bindProps({
-  changePage: bindDispatch("UI_CHANGE_PAGE"),
-  changeFrame: bindDispatch("UI_CHANGE_FRAME"),
-  changeRepo: bindDispatch("REPO_SET_CURRENT"),
-  getRepoList: withDispatch(fetchRepo)
+  changePage: bindD("UI_CHANGE_PAGE"),
+  changeFrame: bindD("UI_CHANGE_FRAME"),
+  changeRepo: bindD("REPOS_SET_CURRENT"),
+  fetchPage: withD(fetchRepo)
 });
 
 RepoList.propTypes = {
@@ -66,7 +65,7 @@ RepoList.propTypes = {
   repo: PropTypes.array,
   page: PropTypes.number,
   changePage: PropTypes.func.isRequired,
-  getRepoList: PropTypes.func.isRequired
+  fetchPage: PropTypes.func.isRequired
 };
 
 export default connect(mapState, mapDispatch)(RepoList);

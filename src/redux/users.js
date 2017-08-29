@@ -1,39 +1,17 @@
 import { merge, assign, get } from "lodash/fp";
 import _ from "lodash";
-import { getCurrentUser } from "../util/users";
-import { logExec } from "../util/util";
+import { currentState, logExec } from "../util/util";
 
-const initialState = {
-  currentUser: undefined,
-  userData: {}
-};
+const initialState = [];
+
 const users = (state = initialState, action) => {
   if (!action) return state;
   const arg = action.payload;
-  const user = getCurrentUser(state);
   switch (action.type) {
-    case "USER_ADD":
-      return {
-        currentUser: arg.login,
-        userData: {
-          ...state.userData,
-          ...{
-            [arg.login]: { ...arg, repos: {} }
-          }
-        }
-      };
-    case "USER_REPO_ADD":
+    case "USERS_ADD":
       return {
         ...state,
-        userData: {
-          ...state.userData,
-          [user.login]: { ...user, repos: merge(user.repos, arg) }
-        }
-      };
-    case "USER_CACHED":
-      return {
-        ...state,
-        currentUser: arg
+        arg
       };
     default:
       return state;

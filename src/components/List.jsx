@@ -1,12 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
 import _ from "lodash";
+import { dataPerPage } from "../util/config.js";
 
 import "./List.css";
 
 class List extends React.Component {
   render() {
-    const { changePage, data, n_pages, onItemClick } = this.props;
+    const { changePage, data, onItemClick, n_pages } = this.props;
     return (
       <div>
         <ul>

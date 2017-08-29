@@ -1,9 +1,6 @@
 import fp from "lodash/fp";
 import _ from "lodash";
-import { getCurrentUserState } from "../util/users.js";
-import { repoListState } from "../util/repos.js";
-import { getRepoPage } from "../util/repos";
-import { bindDispatch } from "../util/util.js";
+import { getCurrent, userCache, bindDispatch } from "../util/util.js";
 
 const fetchApi = args => dispatch => {
   const log_active = true;
@@ -12,8 +9,10 @@ const fetchApi = args => dispatch => {
     func(x);
   };
 
+  console.log(args.request());
+
   return args.cached()
-    ? bindDispatch(args.cached_type)(dispatch)(args.input)
+    ? bindDispatch(args.cached_type)(dispatch)()
     : fetch(args.request())
         .then(fp.invoke("json"))
         .then(
@@ -23,35 +22,45 @@ const fetchApi = args => dispatch => {
               : Promise.resolve(result)
         )
         .then(log("okDispatch called", args.dispatch));
-  //        .catch(bindDispatch("ERROR_ADD")(dispatch));
 };
 
 const fetchUser = input => (dispatch, getState) =>
   dispatch(
     fetchApi({
       input,
-      cached_type: "USER_CACHED",
-      cached: () => _.get(getState().users.userData, input),
+      cached_type: "USERS_CACHED",
+      cached: () => _.get(getState().users.data, input),
       request: () => "http://api.github.com/users/" + input,
-      dispatch: bindDispatch("USER_ADD")(dispatch)
+      dispatch: bindDispatch("USERS_ADD")(dispatch)
     })
   );
 
-const fetchRepo = page => (dispatch, getState) => {
-  const user = getCurrentUserState(getState());
-  const repoList = getRepoPage(page, user);
-  return dispatch(
+const fetchPage = (name, request, isCached) => page => (dispatch, getState) =>
+  dispatch(
     fetchApi({
       input: page,
-      cached_type: "REPO_CACHED",
-      cached: () => repoList !== undefined,
-      request: () => user.repos_url + "?page=" + page,
+      cached_type: name + "_CACHED",
+      cached: () => isCached(getState()),
+      request: () => request(getState()) + "?page=" + page,
       dispatch: _.flow(
         x => ({ [page]: x }),
-        bindDispatch("USER_REPO_ADD")(dispatch)
+        bindDispatch(name + "_ADD")(dispatch)
       )
     })
   );
-};
 
-export { fetchRepo, fetchUser };
+const fetchRepo = page =>
+  fetchPage(
+    "REPOS",
+    _.flow(getCurrent("users"), fp.get("repos_url")),
+    _.flow(getCurrent("users"), fp.get("repos." + page))
+  )(page);
+
+const fetchIssues = page =>
+  fetchPage(
+    "ISSUES",
+    fp.get("repos.current.issues_url"),
+    _.flow(getCurrent("users"), fp.get("issues." + page))
+  )(page);
+
+export { fetchRepo, fetchUser, fetchIssues };
