@@ -1,66 +1,44 @@
 import fp from "lodash/fp";
 import _ from "lodash";
-import { getCurrent, userCache, bindDispatch } from "../util/util.js";
+import { getSelected, userCache, bindDispatch } from "../util/util.js";
+import config from "../util/config.js";
 
-const fetchApi = args => dispatch => {
-  const log_active = true;
-  const log = (str, func) => x => {
-    if (log_active) console.log("fetchApi/", str, x);
-    func(x);
-  };
-
-  console.log(args.request());
-
-  return args.cached()
-    ? bindDispatch(args.cached_type)(dispatch)()
-    : fetch(args.request())
-        .then(fp.invoke("json"))
-        .then(
-          result =>
-            result.message === "Not Found"
-              ? Promise.reject({ type: "ERROR_FETCH_NOT_FOUND", error: result })
-              : Promise.resolve(result)
-        )
-        .then(log("okDispatch called", args.dispatch));
+const fetchApi = (request, prop, result) => (dispatch, getState) => {
+  const cache = getState().cache;
+  const cached = cache ? cache.find(x => x.request === request) : undefined;
+  if (cached) return dispatch({ type: prop + "_CACHED", payload: cached });
+  return fetch(request)
+    .then(fp.invoke("json"))
+    .then(
+      result =>
+        result.message === "Not Found"
+          ? Promise.reject(
+              dispatch({ type: "ERROR_FETCH_NOT_FOUND", error: result })
+            )
+          : Promise.resolve(result)
+    )
+    .then(x => dispatch({ type: prop + "_ADD", payload: result(x), request }));
 };
 
 const fetchUser = input => (dispatch, getState) =>
   dispatch(
-    fetchApi({
-      input,
-      cached_type: "USERS_CACHED",
-      cached: () => _.get(getState().users.data, input),
-      request: () => "http://api.github.com/users/" + input,
-      dispatch: bindDispatch("USERS_ADD")(dispatch)
-    })
+    fetchApi("http://api.github.com/users/" + input, "USERS", _.identity)
   );
 
-const fetchPage = (name, request, isCached) => page => (dispatch, getState) =>
-  dispatch(
-    fetchApi({
-      input: page,
-      cached_type: name + "_CACHED",
-      cached: () => isCached(getState()),
-      request: () => request(getState()) + "?page=" + page,
-      dispatch: _.flow(
-        x => ({ [page]: x }),
-        bindDispatch(name + "_ADD")(dispatch)
-      )
-    })
-  );
+const fetchRepo = page => (dispatch, getState) => {
+  const user = getSelected("users")(getState());
+  const request = `${user.repos_url}?page=${page}&per_page=${config.repos
+    .per_page}`;
+  return dispatch(fetchApi(request, "REPOS", fp.map(x => ({ ...x, page }))));
+};
 
-const fetchRepo = page =>
-  fetchPage(
-    "REPOS",
-    _.flow(getCurrent("users"), fp.get("repos_url")),
-    _.flow(getCurrent("users"), fp.get("repos." + page))
-  )(page);
+const fetchIssues = page => (dispatch, getState) => {
+  const user = getSelected("users")(getState());
+  const repo = getSelected("repos")(getState());
+  console.log(getState());
+  const request = `http://api.github.com/repos/${user.login}/${repo.name}/issues?page=${page}&per_page=${config
+    .issues.per_page}`;
+  return dispatch(fetchApi(request, "ISSUES", fp.map(x => ({ ...x, page }))));
+};
 
-const fetchIssues = page =>
-  fetchPage(
-    "ISSUES",
-    fp.get("repos.current.issues_url"),
-    _.flow(getCurrent("users"), fp.get("issues." + page))
-  )(page);
-
-export { fetchRepo, fetchUser, fetchIssues };
+export { fetchIssues, fetchUser, fetchRepo };

@@ -1,16 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { withDispatch as withD, bindProps, getCurrent } from "../util/util.js";
+import { withDispatch as withD, bindProps, getSelected } from "../util/util.js";
 import { fetchIssues } from "../redux/users.api.js";
+import fp from "lodash/fp";
 
 class Repo extends React.Component {
-  componentWillMount() {
-    this.props.getIssues(1);
-  }
   render() {
     const { repo } = this.props;
-    console.log(repo);
     return (
       repo &&
       <div>
@@ -21,7 +18,7 @@ class Repo extends React.Component {
 }
 
 const mapState = bindProps({
-  repo: getCurrent("repos")
+  repo: getSelected("repos")
 });
 
 const mapDispatch = bindProps({

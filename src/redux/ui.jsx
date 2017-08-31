@@ -9,13 +9,18 @@ const initialState = {
 };
 
 const ui = (state = initialState, action = {}) => {
+  const arg = action.payload;
   switch (action.type) {
     case "UI_CHANGE_PAGE":
-      return { ...state, page: action.payload };
+      return { ...state, page: arg };
     case "UI_CHANGE_FRAME":
-      return { ...state, frame: action.payload };
-    case "UI_SELECTED":
-      return { ...state, selected: action.payload };
+      return { ...state, frame: arg, page: 1 };
+    case "USERS_ADD":
+      return { ...state, selected: { ...state.selected, users: arg.id } };
+    case "USERS_CACHED":
+      return { ...state, selected: { ...state.selected, users: arg.id } };
+    case "UI_SELECT":
+      return { ...state, selected: { ...state.selected, ...arg } };
     default:
       return state;
   }

@@ -2,14 +2,14 @@ import React from "react";
 import PropTypes from "prop-types";
 import Repo from "./Repo.jsx";
 import { connect } from "react-redux";
-import { fetchRepo } from "../redux/users.api";
+import { fetchIssues, fetchRepo } from "../redux/users.api";
 import {
   withDispatch as withD,
   bindDispatch as bindD,
   bindProps,
   getSelected
 } from "../util/util.js";
-import { dataPerPage } from "../util/config";
+import config from "../util/config";
 import List from "../components/List.jsx";
 import _ from "lodash";
 import fp from "lodash/fp";
@@ -24,24 +24,48 @@ class RepoList extends React.Component {
   }
 
   onRepoClick(key) {
-    const { user, page, changeFrame, changeRepo } = this.props;
-    const repoClicked = user.repos[page][key];
+    const {
+      changePage,
+      user,
+      page,
+      changeFrame,
+      changeRepo,
+      getIssues,
+      repos
+    } = this.props;
+    const repoClicked = repos.filter(
+      x => x.owner.id === user.id && x.page === page
+    )[key];
 
-    changeRepo(repoClicked);
-    changeFrame(<Repo />);
+    fetch(
+      `http://api.github.com/repos/${user.login}/${repoClicked.name}/issues?per_page=${config
+        .issues.per_page}`
+    ).then(resp => {
+      changeRepo({ repos: repoClicked.id });
+      const link = resp.headers.get("link");
+      if (link) {
+        const n_pages = parseInt(
+          resp.headers.get("link").match(/page=([0-9]+)>; rel="last"/)[1]
+        );
+        _.range(1, n_pages + 1).map(getIssues);
+      }
+      changeFrame(<Repo />);
+    });
   }
 
   render() {
-    const { changePage, user, page } = this.props;
-    const repo = _.get(user, "repos." + page);
+    const { changePage, user, page, repos } = this.props;
+    const repoList = user
+      ? repos.filter(x => x.owner.id === user.id && x.page === page)
+      : undefined;
     return (
       <div>
-        {repo &&
+        {repoList &&
           <List
             changePage={changePage}
             onItemClick={this.onRepoClick.bind(this)}
-            data={repo}
-            n_pages={user.public_repos / dataPerPage}
+            data={repoList}
+            n_pages={user.public_repos / config.repos.per_page}
           />}
       </div>
     );
@@ -50,13 +74,15 @@ class RepoList extends React.Component {
 
 const mapState = bindProps({
   user: getSelected("users"),
-  page: fp.get("ui.page")
+  page: fp.get("ui.page"),
+  repos: fp.get("repos")
 });
 
 const mapDispatch = bindProps({
   changePage: bindD("UI_CHANGE_PAGE"),
   changeFrame: bindD("UI_CHANGE_FRAME"),
-  changeRepo: bindD("REPOS_SET_CURRENT"),
+  changeRepo: bindD("UI_SELECT"),
+  getIssues: withD(fetchIssues),
   fetchPage: withD(fetchRepo)
 });
 

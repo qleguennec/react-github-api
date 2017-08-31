@@ -6,9 +6,11 @@ import users from "./users";
 import errors from "./errors";
 import repos from "./repos";
 import ui from "./ui.jsx";
+import cache from "./cache.js";
+import issues from "./issues.js";
 
 const store = createStore(
-  combineReducers({ repos, users, errors, ui }),
+  combineReducers({ issues, cache, repos, users, errors, ui }),
   composeWithDevTools(applyMiddleware(thunk))
 );
 

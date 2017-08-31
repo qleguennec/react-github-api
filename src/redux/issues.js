@@ -1,12 +1,12 @@
-const users = (state = [], action) => {
+const issues = (state = [], action) => {
   if (!action) return state;
   const arg = action.payload;
   switch (action.type) {
-    case "USERS_ADD":
+    case "ISSUES_ADD":
       return [...state, arg];
     default:
       return state;
   }
 };
 
-export default users;
+export default issues;

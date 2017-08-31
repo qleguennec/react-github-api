@@ -1,15 +1,9 @@
-const initialState = {
-  current: undefined
-};
-const repos = (state = initialState, action = {}) => {
+const repos = (state = [], action) => {
+  if (!action) return state;
+  const arg = action.payload;
   switch (action.type) {
-    case "REPOS_SET_CURRENT":
-      return {
-        ...state,
-        current: action.payload
-      };
-    case "ISSUES_ADD":
-      return { ...state };
+    case "REPOS_ADD":
+      return state.concat(arg);
     default:
       return state;
   }
