@@ -1,28 +1,26 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import RepoList from "./RepoList";
-import _ from "lodash";
-import fp from "lodash/fp";
-
 import "./GithubUser.css";
+import PropTypes from "prop-types";
+import React from "react";
+import _ from "lodash";
 
 class GithubUser extends React.Component {
-  render() {
-    return (
-      <div>
-        {this.props.frame}
-      </div>
-    );
-  }
+	componentDidMount() {
+		fetch(
+			"https://api.github.com/users/whatever?client_id=96436dd651b42fcd7f28&client_secret=337520471b29782dad2f061e28fe938f2e874f3e"
+		);
+	}
+
+	render() {
+		return (
+			<div>
+				{this.props.frame}
+			</div>
+		);
+	}
 }
 
-const mapState = state => ({
-  frame: state.ui.frame
-});
-
 GithubUser.propTypes = {
-  frame: PropTypes.object.isRequired
+	frame: PropTypes.object.isRequired
 };
 
-export default connect(mapState)(GithubUser);
+export default GithubUser;

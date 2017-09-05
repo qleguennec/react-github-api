@@ -10,3 +10,7 @@
     min-height: 630px;
     background-color: red;
 }
+
+.currentPage li {
+    background-color: blue;
+}
